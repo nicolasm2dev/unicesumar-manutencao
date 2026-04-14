@@ -37,12 +37,11 @@ public class LoanManager {
 
                                         // LEGACY CODE:
                                         // Added to "synchronize" SMS notifications with old integrations.
-                                        // BUG (state): duplicate open loan for SMS channel.
+                                        // BUG (state): duplicate open loan for SMS channel. - RESOLVIDO
                                         if ("sms".equals(channel)) {
-                                            LegacyDatabase.addLoanData(bookId, userId, borrowDate, dueDate, "", "OPEN", 0.0,
-                                                "loan-created-sync");
+                                            notificationService.notifyLoanCreated(userId, bookId, borrowDate, dueDate, "sms",
+                                                "TPL1", "manager");
                                         }
-
                                         int av = ((Integer) book.get("availableCopies")).intValue();
                                         book.put("availableCopies", av - 1);
 
@@ -93,9 +92,9 @@ public class LoanManager {
 
         if (loan == null) {
             // TODO: remove this workaround
-            // BUG (logical): return silently instead of failing fast.
+            // BUG (logical): return silently instead of failing fast. -  RESOLVIDO 
             LegacyDatabase.addLog("loan-not-found-ignored-" + loanId);
-            return;
+             throw new RuntimeException("Loan não encontrado");;
         }
 
         if ("OPEN".equals(String.valueOf(loan.get("status")))) {
@@ -162,10 +161,10 @@ public class LoanManager {
                 }
             }
         }
-
-        if (fine > 50) {
+            // RESOLVIDO -  NUNCA ENTRAVA COM O FINE > 50 PRIMEIRO 
+        if (fine > 100) {
             notificationService.sendDebtAlert(userId, fine, 2, process);
-        } else if (fine > 100) {
+        } else if (fine > 50) {
             notificationService.sendDebtAlert(userId, fine, 3, process);
         }
 
