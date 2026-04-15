@@ -6,14 +6,13 @@ public class Main {
         System.out.println("Starting legacy library system...");
         System.out.println("Mode: " + LegacyDatabase.getSystemMode());
 
-        // sample usage before interactive mode
-        // This simulates old startup behavior
         system.runDemoScenario();
 
         if (args != null && args.length > 0) {
             if ("--report".equals(args[0])) {
-                String report = system.getReportGenerator().generateSimpleReport("Startup Report", 1, "main", "helper", 0,
-                        "");
+                String report = system.getReportGenerator().generateSimpleReport(
+                    "Startup Report", 1, "main", "helper", 0, ""
+                );
                 System.out.println(report);
                 return;
             }
