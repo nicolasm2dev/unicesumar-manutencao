@@ -1,5 +1,6 @@
 
 public class LibraryUI {
+    private final LegacyDatabase db = new LegacyDatabase();
     private final LibraryController controller;
     private boolean running = true;
     private int menuCounter = 0;
@@ -17,7 +18,7 @@ public class LibraryUI {
                 checkMaintenanceTasks();
             } catch (Exception e) {
                 System.out.println("Erro no sistema: " + e.getMessage());
-                LegacyDatabase.addLog("ui-error-" + e.getMessage());
+                db.addLog("ui-error-" + e.getMessage());
             }
         }
     }
@@ -150,7 +151,7 @@ public class LibraryUI {
 
     private void checkMaintenanceTasks() {
         if (menuCounter % 3 == 0) {
-            LegacyDatabase.clearLogsIfTooBig();
+            db.clearLogsIfTooBig();
         }
     }
 }

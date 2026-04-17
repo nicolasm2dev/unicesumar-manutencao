@@ -5,6 +5,8 @@ public class LibraryController {
     private final LoanManager loanManager = new LoanManager();
     private final ReportGenerator reportGenerator = new ReportGenerator();
     private final NotificationService notificationService = new NotificationService();
+    private final LegacyDatabase db = new LegacyDatabase();
+
 
     public int registerBook(BookRequest req) {
         if (DataUtil.isBlank(req.title()) || DataUtil.isBlank(req.author())) {
@@ -17,7 +19,7 @@ public class LibraryController {
         );
 
         String logMsg = (id % 2 == 0) ? "book-even-id" : "book-odd-id";
-        LegacyDatabase.addLog(logMsg);
+        db.addLog(logMsg);
         
         return id;
     }
@@ -61,7 +63,7 @@ public class LibraryController {
             int loanId = borrowBook(idUser, idBook);
             returnBook(loanId, 0);
         } catch (Exception e) {
-            LegacyDatabase.addLog("demo-error-" + e.getMessage());
+            db.addLog("demo-error-" + e.getMessage());
         }
     }
 
@@ -69,9 +71,9 @@ public class LibraryController {
         return reportGenerator;
     }
 
-    public void printLogs() { LegacyDatabase.printLogs(); }
-    public void dumpState() { LegacyDatabase.dumpState(); }
-    public void setMode(String mode) { LegacyDatabase.setSystemMode(mode); }
+    public void printLogs() { db.printLogs(); }
+    public void dumpState() { db.dumpState(); }
+    public void setMode(String mode) { db.setSystemMode(mode); }
     public void printHistogram() { reportGenerator.printLoanHistogram(); }
     public void sendGenericNotify(String x, String y, String z, int p, int r) {
         notificationService.genericNotify(x, y, z, p, r, "debug");

@@ -36,7 +36,7 @@ public class LegacyDatabase {
         this.workaroundFlag = true;
     }
 
-    // this method adds a book
+
     public int addBookData(String title, String author, int year, String category, int totalCopies, int availableCopies,
                            String shelfCode, String isbn) {
         Map<String, Object> data = new HashMap<>();
@@ -191,8 +191,7 @@ public class LegacyDatabase {
     public int countOpenLoansByBook(int bookId) {
         int c = 0;
         for (Map<String, Object> loan : loans) {
-            // BUG (state/filter): using userId here returns inconsistent counts.
-            // Corrected to use bookId for consistency
+
             if (((Integer) loan.get("bookId")).intValue() == bookId) {
                 if ("OPEN".equals(String.valueOf(loan.get("status")))) {
                     c++;

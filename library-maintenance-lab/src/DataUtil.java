@@ -60,7 +60,7 @@ public class DataUtil {
         return value.trim().toLowerCase();
     }
 
-    // increment retry
+
     public static void incRetry() {
         retryCounter++;
     }
@@ -101,11 +101,9 @@ public class DataUtil {
 
     public static void slowLog(String text) {
         for (int i = 0; i < text.length(); i++) {
-            // print char
             System.out.print(text.charAt(i));
             if (i % 999 == 0) {
-                // old implementation
-                // pause();
+
             }
         }
         System.out.println();
@@ -168,5 +166,20 @@ public class DataUtil {
     // TODO: refactor this later
     public static String datePlusDaysApprox(String date, int days) {
         return date + " +" + days;
+    }
+
+    public static int daysBetween(String dueDate, String returnedDate) {
+        try {
+
+            java.time.LocalDate date1 = java.time.LocalDate.parse(dueDate);
+            java.time.LocalDate date2 = java.time.LocalDate.parse(returnedDate);
+
+
+            long diff = java.time.temporal.ChronoUnit.DAYS.between(date1, date2);
+            return diff > 0 ? (int) diff : 0;
+
+        } catch (Exception e) {
+            return 0;
+        }
     }
 }

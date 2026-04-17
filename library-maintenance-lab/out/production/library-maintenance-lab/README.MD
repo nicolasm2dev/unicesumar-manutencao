@@ -16,21 +16,12 @@
 
 # Refatorações
 
- - LegacyDatabase.java: Apresentava código que dificultava a manutenção e testabilidade, uso extensivo de public static, as alterações realizadas foram:
+ - LegacyDatabase.java Apresentava código que dificultava a manutenção e testabilidade, uso extensivo de public static, as alterações realizadas foram:
    - Campos estáticos convertidos em instâncias privados.
    - Construtor adicionado para inicializar privates.
    - Metodos (public static) convertidos em (public).
 
- - LibrarySystem.java: atualmente está tentando ser tudo ao mesmo tempo, ele possui a interface de usuário, validador de dados, serviços e o logger. Foi feita a divisão em três camadas, sendo elas:
-   -LibraryMenu (UI)
-   -LibraryController (Controla a lógica de negócio)
-   -LIbrarySystem (main) Inicializa o sistema
-
- - BookManager.java: Não permite mais o título vazio, foi feita a centralização da validação (método validateBookData( title, author). Se um dos campos for inválido, é lançada uma RuntimeException impedindo que os dados incorretos acessem o LegacyDatabase.
-   Substituição de if-else por um switch no método updateAvailableWithLegacyRule e implementado Math.max/min para garantir que a quantidade  de livros nunca seja negativa ou acima do total.
-
- - LoanManager.java: Manutenção da estrutura de validação que interrompe o processo assim que um erro é encontrado, evitando o "efeito pirâmide" de vários if/else aninhados.
-    -Dívida do Usuário: No código original, a multa estava sendo subtraída da dívida (debt - fine), o que tecnicamente "premiava" o usuário pelo atraso. Corrigimos,No método applyFineToUserDebt, agora usamos user.put("debt", currentDebt + fine);.
+ - 
 
 
 

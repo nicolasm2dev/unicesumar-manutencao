@@ -1,10 +1,11 @@
 
 public class LibrarySystem {
+    private final LegacyDatabase db = new LegacyDatabase();
     private final LibraryController controller;
     private final LibraryUI ui;
 
     public LibrarySystem() {
-        LegacyDatabase.seedInitialData();
+        db.seedInitialData();
         this.controller = new LibraryController();
         this.ui = new LibraryUI(controller);
     }

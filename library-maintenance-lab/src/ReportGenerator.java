@@ -4,8 +4,7 @@ import java.util.Map;
 
 public class ReportGenerator {
 
-    // IMPROVEMENT OPPORTUNITY:
-    // This method combines formatting, data access and business rules.
+    private final LegacyDatabase db = new LegacyDatabase();
     public String generateSimpleReport(String reportName, int mode, String manager, String helper, int yearFilter,
             String categoryFilter) {
         StringBuilder sb = new StringBuilder();
@@ -13,9 +12,9 @@ public class ReportGenerator {
         sb.append("mode=").append(mode).append(" manager=").append(manager).append(" helper=").append(helper).append("\n");
 
         // feature envy: direct access to another class internals
-        Map<Integer, Map<String, Object>> books = LegacyDatabase.getBooks();
-        Map<Integer, Map<String, Object>> users = LegacyDatabase.getUsers();
-        List<Map<String, Object>> loans = LegacyDatabase.getLoans();
+        Map<Integer, Map<String, Object>> books = db.getBooks();
+        Map<Integer, Map<String, Object>> users = db.getUsers();
+        List<Map<String, Object>> loans = db.getLoans();
 
         int totalBooks = books.size();
         int totalUsers = users.size();
@@ -61,7 +60,7 @@ public class ReportGenerator {
 
         if (mode == 1) {
             sb.append("\nRecent logs:\n");
-            List<String> logs = LegacyDatabase.getLogs();
+            List<String> logs = db.getLogs();
             int start = logs.size() - 10;
             if (start < 0) {
                 start = 0;
@@ -71,7 +70,7 @@ public class ReportGenerator {
             }
         }
 
-        LegacyDatabase.addLog("report-generated-" + reportName + "-" + manager + "-" + helper);
+        db.addLog("report-generated-" + reportName + "-" + manager + "-" + helper);
         return sb.toString();
     }
 
@@ -82,7 +81,7 @@ public class ReportGenerator {
 
     public Map<String, Integer> countLoansByUser() {
         Map<String, Integer> map = new HashMap<String, Integer>();
-        for (Map<String, Object> loan : LegacyDatabase.getLoans()) {
+        for (Map<String, Object> loan : db.getLoans()) {
             String uid = String.valueOf(loan.get("userId"));
             Integer c = map.get(uid);
             if (c == null) {

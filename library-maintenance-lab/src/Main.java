@@ -1,10 +1,11 @@
 public class Main {
 
     public static void main(String[] args) {
+        LegacyDatabase db = new LegacyDatabase();
         LibrarySystem system = new LibrarySystem();
 
         System.out.println("Starting legacy library system...");
-        System.out.println("Mode: " + LegacyDatabase.getSystemMode());
+        System.out.println("Mode: " + db.getSystemMode());
 
         system.runDemoScenario();
 

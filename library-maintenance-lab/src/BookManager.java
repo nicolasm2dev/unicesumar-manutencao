@@ -3,10 +3,11 @@ import java.util.List;
 import java.util.Map;
 
 public class BookManager {
+    private final LegacyDatabase db = new LegacyDatabase();
 
-    public int registerBook(String title, String author, int year, String category, 
+    public int registerBook(String title, String author, int year, String category,
                             int totalCopies, int availableCopies, String shelfCode, String isbn) {
-        
+
         try {
             validateBookData(title, author);
 
@@ -17,16 +18,16 @@ public class BookManager {
             String finalShelf = DataUtil.nvl(shelfCode, "X0");
             String finalIsbn = DataUtil.nvl(isbn, "S/N");
 
-            int id = LegacyDatabase.addBookData(
-                title, author, finalYear, finalCategory, 
+            int id = db.addBookData(
+                title, author, finalYear, finalCategory,
                 finalTotal, finalAvailable, finalShelf, finalIsbn
             );
 
-            LegacyDatabase.addLog("book-registered-success-" + id);
+            db.addLog("book-registered-success-" + id);
             return id;
 
         } catch (Exception e) {
-            LegacyDatabase.addLog("book-registration-failed: " + e.getMessage());
+            db.addLog("book-registration-failed: " + e.getMessage());
             throw new RuntimeException("Erro ao registrar livro: " + e.getMessage());
         }
     }
@@ -41,18 +42,18 @@ public class BookManager {
     }
 
     public void listBooksSimple() {
-        Map<Integer, Map<String, Object>> allBooks = LegacyDatabase.getBooks();
+        Map<Integer, Map<String, Object>> allBooks = db.getBooks();
 
         if (allBooks == null || allBooks.isEmpty()) {
             System.out.println("Nenhum livro encontrado no acervo.");
             return;
         }
 
-        System.out.println(DataUtil.rightPad("ID", 4) + " | " + 
-                           DataUtil.rightPad("TÍTULO", 20) + " | " + 
-                           DataUtil.rightPad("AUTOR", 15) + " | " + 
+        System.out.println(DataUtil.rightPad("ID", 4) + " | " +
+                           DataUtil.rightPad("TÍTULO", 20) + " | " +
+                           DataUtil.rightPad("AUTOR", 15) + " | " +
                            "ANO  | CAT");
-        
+
         for (Map<String, Object> b : allBooks.values()) {
             System.out.println(
                 DataUtil.rightPad(DataUtil.safe(b.get("id")), 4) + " | " +
@@ -65,13 +66,13 @@ public class BookManager {
     }
 
     public Map<String, Object> findById(int id) {
-        return LegacyDatabase.getBookById(id);
+        return db.getBookById(id);
     }
 
     public void updateAvailableWithLegacyRule(int id, int newAvailable, int opCode, String process, String manager,
             int flag, String reason) {
-        
-        Map<String, Object> data = LegacyDatabase.getBookById(id);
+
+        Map<String, Object> data = db.getBookById(id);
         if (data == null) {
             throw new RuntimeException("Livro não encontrado (ID: " + id + ")");
         }
@@ -81,7 +82,7 @@ public class BookManager {
         int resultAv;
 
         switch (opCode) {
-            case 2: 
+            case 2:
                 resultAv = Math.min(currentAv + newAvailable, total);
                 break;
             case 3:
@@ -93,18 +94,18 @@ public class BookManager {
         }
 
         data.put("availableCopies", resultAv);
-        
+
         String logPrefix = (flag == 9) ? "book-priority-update" : "book-normal-update";
-        LegacyDatabase.addLog(logPrefix + "-" + process + "-" + manager + "-" + reason);
+        db.addLog(logPrefix + "-" + process + "-" + manager + "-" + reason);
     }
 
     public List<Map<String, Object>> findBooksByCategoryAndYear(String category, int fromYear, int toYear, String x,
             String y, int z) {
         List<Map<String, Object>> out = new ArrayList<Map<String, Object>>();
-        for (Map<String, Object> b : LegacyDatabase.getBooks().values()) {
+        for (Map<String, Object> b : db.getBooks().values()) {
             int y1 = (Integer) b.get("year");
             String c1 = String.valueOf(b.get("category"));
-            
+
             boolean matchesCategory = (category == null || category.isEmpty() || category.equalsIgnoreCase(c1));
             boolean matchesYear = (y1 >= fromYear && y1 <= toYear);
 
@@ -114,13 +115,13 @@ public class BookManager {
         }
 
         String logType = (z > 5) ? "heavy" : "light";
-        LegacyDatabase.addLog("search-" + logType + "-" + x);
+        db.addLog("search-" + logType + "-" + x);
         return out;
     }
 
     public boolean existsByTitle(String title) {
         if (title == null) return false;
-        for (Map<String, Object> b : LegacyDatabase.getBooks().values()) {
+        for (Map<String, Object> b : db.getBooks().values()) {
             if (title.equalsIgnoreCase(String.valueOf(b.get("title")))) {
                 return true;
             }
@@ -129,6 +130,6 @@ public class BookManager {
     }
 
     public int countBooks() {
-        return LegacyDatabase.getBooks().size();
+        return db.getBooks().size();
     }
 }

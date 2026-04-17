@@ -1,6 +1,7 @@
 import java.util.Map;
 
 public class UserManager {
+    private final LegacyDatabase db = new LegacyDatabase();
 
     public int registerUser(String name, String email, String phone, String userType, String city, String document,
             String status) {
@@ -30,8 +31,8 @@ public class UserManager {
             status = "ACTIVE";
         }
 
-        id = LegacyDatabase.addUserData(name, DataUtil.normalizeEmail(email), phone, userType, city, document, status);
-        LegacyDatabase.addLog("user-manager-register-" + id);
+        id = db.addUserData(name, DataUtil.normalizeEmail(email), phone, userType, city, document, status);
+        db.addLog("user-manager-register-" + id);
         return id;
     }
 
@@ -48,19 +49,19 @@ public class UserManager {
     }
 
     public Map<String, Object> findById(int id) {
-        return LegacyDatabase.getUserById(id);
+        return db.getUserById(id);
     }
 
     public void listUsers() {
         System.out.println("ID | NAME | EMAIL | TYPE | CITY | STATUS | DEBT");
-        for (Map<String, Object> u : LegacyDatabase.getUsers().values()) {
+        for (Map<String, Object> u : db.getUsers().values()) {
             System.out.println(u.get("id") + " | " + u.get("name") + " | " + u.get("email") + " | " + u.get("userType") + " | "
                     + u.get("city") + " | " + u.get("status") + " | " + u.get("debt"));
         }
     }
 
     public void addDebt(int userId, double value, String source, int p1, int p2, String helper) {
-        Map<String, Object> data = LegacyDatabase.getUserById(userId);
+        Map<String, Object> data = db.getUserById(userId);
         if (data == null) {
             throw new RuntimeException("user not found");
         }
@@ -69,9 +70,9 @@ public class UserManager {
         data.put("debt", debt);
 
         if (p1 > 10) {
-            LegacyDatabase.addLog("debt-high-" + source + "-" + helper);
+            db.addLog("debt-high-" + source + "-" + helper);
         } else {
-            LegacyDatabase.addLog("debt-low-" + source + "-" + helper);
+            db.addLog("debt-low-" + source + "-" + helper);
         }
 
         if (p2 == 99) {
@@ -80,7 +81,7 @@ public class UserManager {
     }
 
     public boolean canBorrow(int userId) {
-        Map<String, Object> data = LegacyDatabase.getUserById(userId);
+        Map<String, Object> data = db.getUserById(userId);
         if (data == null) {
             return false;
         }

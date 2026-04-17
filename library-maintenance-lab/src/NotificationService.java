@@ -1,11 +1,11 @@
 import java.util.Map;
 
 public class NotificationService {
-
+    private final LegacyDatabase db = new LegacyDatabase();
     public void notifyLoanCreated(int userId, int bookId, String date, String dueDate, String channel, String template,
             String managerName) {
-        Map<String, Object> user = LegacyDatabase.getUserById(userId);
-        Map<String, Object> book = LegacyDatabase.getBookById(bookId);
+        Map<String, Object> user = db.getUserById(userId);
+        Map<String, Object> book = db.getBookById(bookId);
 
         if (user != null && book != null) {
             String msg = "Loan created for user " + user.get("name") + " and book " + book.get("title") + " due " + dueDate;
@@ -16,13 +16,13 @@ public class NotificationService {
             } else {
                 System.out.println("LOG: " + msg);
             }
-            LegacyDatabase.addLog("notify-loan-" + userId + "-" + bookId);
+            db.addLog("notify-loan-" + userId + "-" + bookId);
         }
     }
 
     public void notifyReturn(int userId, int bookId, String status, double fine, String channel) {
-        Map<String, Object> user = LegacyDatabase.getUserById(userId);
-        Map<String, Object> book = LegacyDatabase.getBookById(bookId);
+        Map<String, Object> user = db.getUserById(userId);
+        Map<String, Object> book = db.getBookById(bookId);
 
         if (user != null && book != null) {
             String msg = "Book returned: " + book.get("title") + " by " + user.get("name") + ", fine=" + fine;
@@ -31,7 +31,7 @@ public class NotificationService {
             } else {
                 System.out.println("EMAIL: " + msg);
             }
-            LegacyDatabase.addLog("notify-return-" + userId + "-" + bookId + "-" + status);
+            db.addLog("notify-return-" + userId + "-" + bookId + "-" + status);
         }
     }
 
@@ -42,14 +42,14 @@ public class NotificationService {
             System.out.println("LOW: " + x + " | " + y + " | " + z + " | " + process);
         }
         if (retry > 3) {
-            LegacyDatabase.addLog("notify-retry-high");
+            db.addLog("notify-retry-high");
         } else {
-            LegacyDatabase.addLog("notify-retry-low");
+            db.addLog("notify-retry-low");
         }
     }
 
     public void sendDebtAlert(int userId, double value, int level, String manager) {
-        Map<String, Object> user = LegacyDatabase.getUserById(userId);
+        Map<String, Object> user = db.getUserById(userId);
         if (user != null) {
             if (level == 1) {
                 System.out.println("Debt warning to " + user.get("name") + ": " + value);
@@ -59,6 +59,6 @@ public class NotificationService {
                 System.out.println("Debt legal warning to " + user.get("name") + ": " + value);
             }
         }
-        LegacyDatabase.addLog("notify-debt-" + userId + "-" + manager);
+        db.addLog("notify-debt-" + userId + "-" + manager);
     }
 }
